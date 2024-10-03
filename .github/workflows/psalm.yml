@@ -14,24 +14,24 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      # Install PHP and dependencies
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.2' # Specify the PHP version you need
+          php-version: '8.1'
           extensions: mbstring, dom
 
       - name: Install Composer dependencies
-        run: composer install
+        run: composer install --no-scripts --no-progress
 
-      # Run Psalm for static analysis
+      - name: Regenerate Composer autoload files
+        run: composer dump-autoload
+
       - name: Run Psalm
         uses: docker://ghcr.io/psalm/psalm-github-actions:5.7.7
         with:
           security_analysis: true
           report_file: results.sarif
 
-      # Upload SARIF results for security analysis (optional)
       - name: Upload Security Analysis results to GitHub
         uses: github/codeql-action/upload-sarif@v2
         with:
