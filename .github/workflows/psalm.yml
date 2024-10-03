@@ -22,7 +22,7 @@ jobs:
           extensions: mbstring, dom
 
       - name: Install Composer dependencies
-        run: composer install --no-scripts --no-progress
+        run: composer install
 
       # Run Psalm for static analysis
       - name: Run Psalm
