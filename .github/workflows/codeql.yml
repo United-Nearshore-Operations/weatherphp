@@ -1,0 +1,63 @@
+name: "CodeQL and Psalm Analysis"
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  schedule:
+    - cron: '37 10 * * 4'
+
+jobs:
+  # CodeQL analysis for JavaScript/TypeScript
+  codeql-analyze:
+    name: CodeQL Analyze JavaScript/TypeScript
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      packages: read
+      actions: read
+      contents: read
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [javascript-typescript]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v3
+      with:
+        languages: ${{ matrix.language }}
+        build-mode: none
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v3
+      with:
+        category: "/language:${{matrix.language}}"
+
+  # Psalm analysis for PHP
+  psalm-analyze:
+    name: Psalm Analyze PHP
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.1'  # Change this to the version you need
+
+    - name: Install Composer dependencies
+      run: composer install --no-progress --no-suggest --prefer-dist
+
+    - name: Run Psalm
+      uses: psalm/psalm-github-actions@v1
+      with:
+        php_version: '8.1'  # Set PHP version matching your project requirements
+        working-directory: './'  # Adjust if Psalm is in a specific subdirectory
